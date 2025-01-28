@@ -6,6 +6,7 @@ import { PointerLockControls } from "three/addons/controls/PointerLockControls.j
 import { environmentSetup, sky } from "./environment";
 import { scene1 } from "./scene1";
 import { scene2, animateScene2 } from "./scene2";
+import { scene3, animatescene3 } from "./scene3";
 
 const playerHeight = 1.6;
 
@@ -74,13 +75,22 @@ window.addEventListener("resize", onWindowResize);
 function init() {
     environmentSetup(scene);
     scene1(scene, 0);
-    scene2(scene, 25); // 25
+    scene3(scene, 30);
+    scene2(scene, 35); // 35
 }
 
 function setupXR() {
     renderer.xr.enabled = true;
     renderer.xr.setFramebufferScaleFactor(2.0);
     document.body.appendChild(VRButton.createButton(renderer));
+
+    renderer.xr.addEventListener("sessionstart", () => {
+        dolly.position.y = 0;
+    });
+
+    renderer.xr.addEventListener("sessionend", () => {
+        dolly.position.y = playerHeight;
+    });
 
     const controller = renderer.xr.getController(0);
     dolly.add(controller);
@@ -157,7 +167,9 @@ function handleController(controller, dt) {
             camera.getWorldQuaternion(new THREE.Quaternion()),
         );
         dolly.translateZ(dt * -speed);
-        dolly.position.y = 0;
+        if (dolly.position.z > -57 - 35) {
+            dolly.position.y = 0;
+        }
         dolly.quaternion.copy(quaternion);
     }
 }
@@ -169,6 +181,7 @@ function animate() {
     }
 
     animateScene2();
+    animatescene3();
 
     const dt = clock.getDelta();
 
@@ -187,10 +200,22 @@ function animate() {
     const controller = renderer.xr.getController(0);
     if (controller) handleController(controller, dt);
 
-    if (dolly.position.z < -57 - 25) {
-        dolly.position.y = dolly.position.y - 1;
-        if (dolly.position.z < -57 - 25) {
-            dolly.position.z = -57.5 - 25;
+    if (dolly.position.x < -1.9) {
+        dolly.position.x = -1.9;
+    } else if (dolly.position.x > 1.9) {
+        dolly.position.x = 1.9;
+    }
+
+    if (dolly.position.z > 0.9) {
+        dolly.position.z = 0.9;
+    }
+
+    if (dolly.position.z < -57 - 35) {
+        if (dolly.position.y > -150) {
+            dolly.position.y = dolly.position.y - 1;
+            if (dolly.position.z < -57 - 35) {
+                dolly.position.z = -57.5 - 35;
+            }
         }
     }
 }

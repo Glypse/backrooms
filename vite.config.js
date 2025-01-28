@@ -7,8 +7,5 @@ export default defineConfig({
             cert: "./myapp.crt",
         },
     },
-    optimizeDeps: {
-        include: ["three/webgpu"],
-    },
     base: "/backrooms/",
 });

@@ -3,10 +3,10 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 let grassMaterial;
 const clock = new THREE.Clock();
-const grassDensity = 20,
-    planeWidth = 3,
-    planeDepth = 20;
-let scene2Empty;
+const grassDensity = 50,
+    planeWidth = 4,
+    planeDepth = 10;
+let sceneEmpty;
 
 const createGrass = async () => {
     const groundGeometry = new THREE.PlaneGeometry(planeWidth, planeDepth);
@@ -14,19 +14,38 @@ const createGrass = async () => {
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
-    scene2Empty.add(ground);
+    sceneEmpty.add(ground);
 
     const gltfLoader = new GLTFLoader();
-    const gltf = await gltfLoader.loadAsync("assets/grassLOD1File.glb");
+    const gltf = await gltfLoader.loadAsync(
+        `${import.meta.env.BASE_URL}assets/grassLOD1File.glb`,
+    );
 
     grassMaterial = new THREE.MeshStandardMaterial({
         color: 0x408f40,
+        emissive: 0x408f40,
+        emissiveIntensity: 0.1,
+        roughnessMap: new THREE.TextureLoader().load(
+            `${import.meta.env.BASE_URL}assets/grassRoughness.png`,
+        ),
+        bumpMap: new THREE.TextureLoader().load(
+            `${import.meta.env.BASE_URL}assets/grassBump.png`,
+        ),
+        bumpScale: 4,
+    });
+
+    /* grassMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
         roughnessMap: new THREE.TextureLoader().load(
             "assets/grassRoughness.png",
         ),
         bumpMap: new THREE.TextureLoader().load("assets/grassBump.png"),
         bumpScale: 4,
-    });
+        thickness: 2,
+        attenuationColor: 0x56bf56,
+        attenuationDistance: 0.5,
+        transmission: 1,
+    }); */
     grassMaterial.side = THREE.DoubleSide;
     grassMaterial.onBeforeCompile = (shader) => {
         shader.uniforms.time = { value: 0 };
@@ -92,37 +111,52 @@ const createGrass = async () => {
                     j - planeDepth / 2 + Math.random(),
                 );
                 dummy.rotation.y = Math.random() * Math.PI * 2;
-                dummy.scale.setScalar(Math.random() * 0.5 + 0.75);
+                dummy.scale.setScalar(Math.random() * 0.75 + 0.75);
+                dummy.scale.z *= 0.75;
                 dummy.updateMatrix();
                 instancedMesh.setMatrixAt(index++, dummy.matrix);
             }
         }
     }
 
-    scene2Empty.add(instancedMesh);
+    sceneEmpty.add(instancedMesh);
 };
 
-export const scene2 = async (scene, posZ) => {
-    scene2Empty = new THREE.Group();
-    scene2Empty.position.set(0, 0, -posZ);
-    scene.add(scene2Empty);
+export const scene3 = async (scene, posZ) => {
+    sceneEmpty = new THREE.Group();
+    sceneEmpty.position.set(0, 0, -posZ);
+    scene.add(sceneEmpty);
 
-    const dirLight = new THREE.DirectionalLight(0xffdd94, 8);
-    dirLight.position.set(0, 2, -planeDepth / 2 - 1);
-    dirLight.castShadow = true;
-    dirLight.shadow.camera.near = 0.5;
-    dirLight.shadow.camera.top = 5.5;
-    dirLight.shadow.camera.far = 52;
-    scene2Empty.add(dirLight);
+    const light = new THREE.PointLight(0xff967c, 100, 5, 1);
+    /* const lightHelper = new THREE.PointLightHelper(light); */
+    light.position.set(0, 2.25, 0);
+    sceneEmpty.add(light);
 
-    /* const helper = new THREE.DirectionalLightHelper(dirLight);
-    scene2Empty.add(helper); */
+    const orbGeometry = new THREE.SphereGeometry(0.25, 32, 16);
+    const orbMaterial = new THREE.MeshStandardMaterial({
+        color: 0xff967c,
+        emissive: 0xff967c,
+        emissiveIntensity: 10,
+    });
+    const orb = new THREE.Mesh(orbGeometry, orbMaterial);
+    light.add(orb);
+
+    const wallGroundGeometry = new THREE.PlaneGeometry(800, 4);
+    const wallGroundMaterial = new THREE.MeshStandardMaterial({
+        side: THREE.BackSide,
+        color: 0x000000,
+    });
+    const wallGround = new THREE.Mesh(wallGroundGeometry, wallGroundMaterial);
+    wallGround.receiveShadow = true;
+    wallGround.rotateZ(-Math.PI / 2);
+    wallGround.position.set(0, -400, -5);
+    sceneEmpty.add(wallGround);
 
     createGrass();
-    animateScene2();
+    animatescene3();
 };
 
-export const animateScene2 = () => {
+export const animatescene3 = () => {
     if (
         grassMaterial &&
         grassMaterial.userData &&

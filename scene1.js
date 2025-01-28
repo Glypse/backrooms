@@ -9,17 +9,19 @@ export const scene1 = async (scene, posZ) => {
     sceneEmpty.position.set(0, 0, -posZ);
     scene.add(sceneEmpty);
 
-    new GLTFLoader().load("assets/Hlw0.3.glb", (gltf) => {
-        hallway = gltf.scene;
-        hallway.traverse((child) => {
-            if (child.isMesh) {
-                child.receiveShadow = true;
-                child.material.normalScale.set(0.5, 0.5);
-                /* child.material.normalMap = null; */
-                /* child.material.bumpMap = null;
+    new GLTFLoader().load(
+        `${import.meta.env.BASE_URL}assets/Hlw0.3.glb`,
+        (gltf) => {
+            hallway = gltf.scene;
+            hallway.traverse((child) => {
+                if (child.isMesh) {
+                    child.receiveShadow = true;
+                    child.material.normalScale.set(0.5, 0.5);
+                    /* child.material.normalMap = null; */
+                    /* child.material.bumpMap = null;
                 child.material.map = null;
                 child.material.roughnessMap = null; */
-                /* child.material.onBeforeCompile = function (shader) {
+                    /* child.material.onBeforeCompile = function (shader) {
                         shader.fragmentShader = shader.fragmentShader.replace(
                             "#include <roughnessmap_fragment>",
                             THREE.ShaderChunk.roughnessmap_fragment.replace(
@@ -28,12 +30,13 @@ export const scene1 = async (scene, posZ) => {
                             ),
                         );
                     }; */
-            }
-        });
-        hallway.rotateY(-Math.PI / 2);
-        hallway.position.set(0, 0, -12);
-        sceneEmpty.add(hallway);
-    });
+                }
+            });
+            hallway.rotateY(-Math.PI / 2);
+            hallway.position.set(0, 0, -12);
+            sceneEmpty.add(hallway);
+        },
+    );
 
     const lightColor = 0xe6fff2;
     const light = new THREE.PointLight(lightColor, 4, 0, 2);
@@ -85,7 +88,7 @@ export const scene1 = async (scene, posZ) => {
     wallBlocker.castShadow = true;
     sceneEmpty.add(wallBlocker); */
 
-    const wallGroundGeometry = new THREE.PlaneGeometry(800, 4);
+    /* const wallGroundGeometry = new THREE.PlaneGeometry(800, 4);
     const wallGroundMaterial = new THREE.MeshStandardMaterial({
         side: THREE.BackSide,
         color: 0x000000,
@@ -94,5 +97,5 @@ export const scene1 = async (scene, posZ) => {
     wallGround.receiveShadow = true;
     wallGround.rotateZ(-Math.PI / 2);
     wallGround.position.set(0, -400, -25);
-    sceneEmpty.add(wallGround);
+    sceneEmpty.add(wallGround); */
 };

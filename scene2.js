@@ -10,24 +10,30 @@ export const scene2 = async (scene, posZ) => {
     scene.add(sceneEmpty);
 
     const GLTLoader = new GLTFLoader();
-    const TXTRLoader = new THREE.TextureLoader();
 
-    GLTLoader.load("assets/Mountains.glb", (gltf) => {
-        const mountain = gltf.scene;
-        mountain.position.set(0, -200, 0);
-        sceneEmpty.add(mountain);
+    GLTLoader.load(
+        `${import.meta.env.BASE_URL}assets/Mountains.glb`,
+        (gltf) => {
+            const mountain = gltf.scene;
+            mountain.position.set(0, -200, 0);
+            sceneEmpty.add(mountain);
 
-        // Create a 3x3 grid of instances
-        const distance = 900;
-        for (let i = -1; i <= 1; i++) {
-            for (let j = -1; j <= 1; j++) {
-                if (i === 0 && j === 0) continue; // Skip the original mountain
-                const mountainClone = mountain.clone();
-                mountainClone.position.set(i * distance, -200, j * distance);
-                sceneEmpty.add(mountainClone);
+            // Create a 3x3 grid of instances
+            const distance = 900;
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue; // Skip the original mountain
+                    const mountainClone = mountain.clone();
+                    mountainClone.position.set(
+                        i * distance,
+                        -200,
+                        j * distance,
+                    );
+                    sceneEmpty.add(mountainClone);
+                }
             }
-        }
-    });
+        },
+    );
 
     const orbGeometry = new THREE.SphereGeometry(4, 64, 32);
     const orbMaterial = new THREE.MeshPhysicalMaterial({
@@ -76,7 +82,7 @@ export const scene2 = async (scene, posZ) => {
     sceneEmpty.add(door);
 
     let chair;
-    GLTLoader.load("assets/Chair.glb", (gltf) => {
+    GLTLoader.load(`${import.meta.env.BASE_URL}assets/Chair.glb`, (gltf) => {
         chair = gltf.scene;
         chair.traverse((child) => {
             if (child.isMesh) {
